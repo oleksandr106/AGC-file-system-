@@ -1,0 +1,74 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: dms-mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_change_me
+      MYSQL_DATABASE: dms_db
+      MYSQL_USER: dms
+      MYSQL_PASSWORD: dms_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./certs:/certs:ro
+    command: >
+      --require-secure-transport
+      --ssl-ca=/certs/ca-cert.pem
+      --ssl-cert=/certs/server-cert.pem
+      --ssl-key=/certs/server-key.pem
+    networks:
+      - dms-network
+
+  clamav:
+    image: clamav/clamav:latest
+    container_name: dms-clamav
+    restart: always
+    networks:
+      - dms-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: dms-backend
+    restart: always
+    depends_on:
+      - mariadb
+      - clamav
+    environment:
+      - DMS_DATABASE_URL=mysql+pymysql://dms:dms_password@mariadb:3306/dms_db?ssl_ca=/certs/ca-cert.pem&ssl_cert=/certs/client-cert.pem&ssl_key=/certs/client-key.pem&ssl_check_hostname=false
+      - CLAMAV_HOST=clamav
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+      - ./backups:/app/backups
+      - ./certs:/certs:ro
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - dms-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: dms-frontend
+    restart: always
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+      - ./style.css:/usr/share/nginx/html/style.css
+      - ./app.js:/usr/share/nginx/html/app.js
+      - ./bg3d.js:/usr/share/nginx/html/bg3d.js
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - dms-network
+
+volumes:
+  mariadb_data:
+
+networks:
+  dms-network:
+    driver: bridge

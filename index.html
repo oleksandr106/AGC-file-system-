@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AGC Technowizz 2027 — Prémiový systém pro správu řízené dokumentace s fulltextovým vyhledáváním a verzováním.">
+    <title>AGC Technowizz 2027 | Premium DMS</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="/style.css">
+    <!-- Three.js for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas" class="bg-canvas"></canvas>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div id="modalTitle" class="modal-title"></div>
+            <div id="modalDesc" class="modal-desc"></div>
+            <div id="modalActions" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="openMobileSidebar()">
+            <i class="ph-bold ph-list"></i>
+        </button>
+        <span class="mobile-brand">AGC DMS</span>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+            <i class="ph-duotone ph-sun"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="clickHint" class="click-hint">KLIKNI NA MODEL PRO VSTUP</div>
+    <div id="loginScreen" class="login-container login-hidden">
+        <div class="login-card">
+            <div class="login-logo">AGC Premium DMS</div>
+            <div class="login-subtitle">Technowizz 2027</div>
+            <span class="login-version">v2.0 — Overhaul</span>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Uživatelské jméno</label>
+                    <input type="text" id="username" class="form-input" required placeholder="Např. admin" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Heslo</label>
+                    <input type="password" id="password" class="form-input" required placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <button type="submit" class="login-btn">Přihlásit se</button>
+                <div id="loginError" class="login-error">Nesprávné přihlašovací údaje.</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== APP SCREEN ==================== -->
+    <div id="appScreen" class="app-container">
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">A</div>
+                <div class="brand-text">AGC DMS</div>
+                <span class="brand-badge">v2.0</span>
+            </div>
+
+            <span class="sidebar-section-label">Navigace</span>
+            <ul class="nav-menu">
+                <li class="nav-item active" id="menu-dash">
+                    <a onclick="switchView('dashboard')">
+                        <i class="ph-duotone ph-chart-pie-slice"></i> Přehled
+                    </a>
+                </li>
+                <li class="nav-item" id="menu-docs">
+                    <a onclick="switchView('documents')">
+                        <i class="ph-duotone ph-folder-open"></i> Dokumenty
+                    </a>
+                </li>
+                <li class="nav-item" id="menu-upload">
+                    <a onclick="switchView('upload')">
+                        <i class="ph-duotone ph-cloud-arrow-up"></i> Nový dokument
+                    </a>
+                </li>
+                <li class="nav-item" id="menu-info">
+                    <a onclick="switchView('info')">
+                        <i class="ph-duotone ph-info"></i> Informace
+                    </a>
+                </li>
+                <li class="nav-item" id="menu-admin" style="display: none;">
+                    <a onclick="switchView('admin')">
+                        <i class="ph-duotone ph-shield-check"></i> Správa systému
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">?</div>
+                    <div class="user-details">
+                        <span class="user-name" id="displayUsername">Uživatel</span>
+                        <span class="user-role" id="displayRole">Role</span>
+                    </div>
+                    <button class="theme-toggle" id="themeToggleSidebar" onclick="toggleTheme()" title="Přepnout téma">
+                        <i class="ph-duotone ph-sun"></i>
+                    </button>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="sidebar-action-btn logout" onclick="handleLogout()">
+                        <i class="ph-bold ph-sign-out"></i> Odhlásit
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1 id="viewTitle">Přehled</h1>
+                    <p id="viewSubtitle">Vítejte v systému pro správu řízené dokumentace.</p>
+                </div>
+            </header>
+
+            <!-- ========== DASHBOARD ========== -->
+            <section id="view-dashboard" class="view-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Dokumenty</h3>
+                            <p class="stat-value" id="statDocs">0</p>
+                        </div>
+                        <div class="stat-icon blue"><i class="ph-duotone ph-file-text"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Verze souborů</h3>
+                            <p class="stat-value" id="statVersions">0</p>
+                        </div>
+                        <div class="stat-icon red"><i class="ph-duotone ph-files"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3>Uživatelé</h3>
+                            <p class="stat-value" id="statUsers">0</p>
+                        </div>
+                        <div class="stat-icon purple"><i class="ph-duotone ph-users-three"></i></div>
+                    </div>
+                </div>
+
+                <div class="panel-grid">
+                    <div class="panel">
+                        <h2 class="panel-title"><i class="ph-duotone ph-clock"></i> Nedávno nahrané</h2>
+                        <div id="recentDocuments" class="recent-list">
+                            <div class="empty-state">
+                                <i class="ph-duotone ph-folder-simple-dashed"></i>
+                                <p>Načítání...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2 class="panel-title"><i class="ph-duotone ph-chart-bar"></i> Kategorie</h2>
+                        <div id="categoryChart" class="category-chart">
+                            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1rem;">Načítání...</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ========== INFO ========== -->
+            <section id="view-info" class="view-section">
+                <div class="panel">
+                    <h2 class="panel-title"><i class="ph-duotone ph-info"></i> O projektu</h2>
+                    <p class="about-text">
+                        Tento dokumentační portál řeší roztříštěnost souborů mezi síťovými disky, SharePointem a Risconem v rámci zadání Technowizz 2027. Systém nabízí plnou integraci fulltextového vyhledávání obsahu uvnitř PDF dokumentů a stará se o automatické verzování.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="ph-duotone ph-magnifying-glass-plus"></i>
+                            <h4>Fulltextové hledání</h4>
+                            <p>Vyhledávání uvnitř obsahu PDF, Word a Excel souborů</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="ph-duotone ph-git-branch"></i>
+                            <h4>Verzování</h4>
+                            <p>Automatická správa verzí dokumentů</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="ph-duotone ph-shield-check"></i>
+                            <h4>Zabezpečení</h4>
+                            <p>JWT autentizace a rolové oprávnění</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="ph-duotone ph-database"></i>
+                            <h4>Zálohy</h4>
+                            <p>Jednoduchá tvorba záloh databáze</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== DOCUMENTS ========== -->
+            <section id="view-documents" class="view-section">
+                <div class="panel">
+                    <div class="search-bar-container">
+                        <div class="search-input-wrapper">
+                            <i class="ph-bold ph-magnifying-glass"></i>
+                            <input type="text" id="searchQuery" class="search-input"
+                                   placeholder="Hledat podle názvu, kategorie nebo obsahu dokumentu..."
+                                   oninput="debounceSearch()"
+                                   onkeyup="if(event.key === 'Enter') executeSearch()">
+                        </div>
+                        <select id="categoryFilter" class="filter-select" onchange="onCategoryFilterChange()">
+                            <option value="">Všechny kategorie</option>
+                            <option value="Řízená dokumentace">Řízená dokumentace</option>
+                            <option value="Výrobní dokumentace">Výrobní dokumentace</option>
+                            <option value="Školení a podklady">Školení a podklady</option>
+                        </select>
+                        <select id="statusFilter" class="filter-select" onchange="onStatusFilterChange()">
+                            <option value="">Všechny stavy</option>
+                            <option value="DRAFT">Koncept</option>
+                            <option value="PENDING_APPROVAL">Čeká na schválení</option>
+                            <option value="APPROVED">Schváleno</option>
+                            <option value="ARCHIVED">Archivováno</option>
+                        </select>
+                        <button class="btn-primary" onclick="executeSearch()">
+                            <i class="ph-bold ph-magnifying-glass"></i> Hledat
+                        </button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="dms-table">
+                            <thead>
+                                <tr>
+                                    <th>Název dokumentu</th>
+                                    <th>Kategorie</th>
+                                    <th>Stav</th>
+                                    <th>Poslední změna</th>
+                                    <th>Verze</th>
+                                    <th style="width: 120px;">Akce</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documentsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="paginationContainer"></div>
+                </div>
+            </section>
+
+            <!-- ========== UPLOAD ========== -->
+            <section id="view-upload" class="view-section">
+                <div class="panel" style="max-width: 720px;">
+                    <h2 class="panel-title"><i class="ph-duotone ph-upload-simple"></i> Nahrání dokumentu</h2>
+                    <form id="uploadForm" onsubmit="handleUpload(event)">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="uploadTitle">Název dokumentu</label>
+                                <input type="text" id="uploadTitle" class="form-input" required
+                                       placeholder="Např. SM_04_Smernice_BOZP">
+                            </div>
+                            <div class="form-group">
+                                <label for="uploadCategory">Kategorie</label>
+                                <select id="uploadCategory" class="select-input">
+                                    <option value="Řízená dokumentace">Řízená dokumentace</option>
+                                    <option value="Výrobní dokumentace">Výrobní dokumentace</option>
+                                    <option value="Školení a podklady">Školení a podklady</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="uploadVersion">Číslo verze</label>
+                                <input type="number" id="uploadVersion" class="form-input" step="0.1" value="1.0" min="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="uploadStatus">Stav dokumentu</label>
+                                <select id="uploadStatus" class="select-input">
+                                    <option value="APPROVED">Schváleno (Platné)</option>
+                                    <option value="DRAFT">Koncept</option>
+                                    <option value="PENDING_APPROVAL">Čeká na schválení</option>
+                                    <option value="ARCHIVED">Archivováno</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Soubor</label>
+                                <div class="file-dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                                    <i class="ph-duotone ph-file-arrow-up"></i>
+                                    <p id="fileLabel">Klikněte nebo přetáhněte soubor</p>
+                                    <p class="file-hint" id="fileHint">PDF, DOCX, XLSX, PPTX, TXT, CSV, obrázky</p>
+                                    <input type="file" id="fileInput" style="display: none;" required onchange="updateFileLabel()">
+                                </div>
+                                <div id="filePreviewContainer" style="display: none; margin-top: 1rem; text-align: center; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; background: var(--bg-surface);">
+                                    <h4 style="margin-bottom: 0.5rem; color: var(--text);">Náhled souboru</h4>
+                                    <div id="filePreviewContent" style="max-height: 400px; overflow: auto; border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem;">
+                            <button type="submit" id="uploadBtn" class="btn-primary" style="padding: 0.85rem 2.5rem;">
+                                <i class="ph-bold ph-cloud-arrow-up"></i> Uložit do systému
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ========== ADMIN ========== -->
+            <section id="view-admin" class="view-section">
+                <!-- Backup Section -->
+                <div class="panel">
+                    <h2 class="panel-title" style="color: var(--accent-amber);"><i class="ph-duotone ph-database"></i> Záloha databáze</h2>
+                    <p style="margin-bottom: 1.25rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        Vytvoří SQL export MariaDB databáze do adresáře <code style="background: var(--bg-glass); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">backups/</code> na serveru.
+                    </p>
+                    <button id="backupBtn" class="btn-secondary" onclick="createBackup()">
+                        <i class="ph-duotone ph-database"></i> Vytvořit zálohu
+                    </button>
+                </div>
+
+                <!-- User Management Section -->
+                <div class="panel">
+                    <h2 class="panel-title"><i class="ph-duotone ph-users"></i> Správa uživatelů</h2>
+
+                    <div style="overflow-x: auto;">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Uživatel</th>
+                                    <th>Role</th>
+                                    <th>Vytvořen</th>
+                                    <th style="width: 80px;">Akce</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="/bg3d.js?v=2.4"></script>
+    <script src="/app.js?v=2.6"></script>
+</body>
+</html>

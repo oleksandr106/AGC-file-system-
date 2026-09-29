@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env
+
+# Ignorovat Node modules
+node_modules/
+
+# Ignorovat databázi
+dms.db
+
+# Ignorovat složky s daty
+uploads/
+backups/
+
+# Ostatní nepotřebné soubory
+.git/
+.gitignore
+Dockerfile
+.dockerignore

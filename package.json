@@ -1,0 +1,14 @@
+{
+  "name": "agc-technowizz-2027",
+  "version": "1.0.0",
+  "description": "Elektronicka archivace a digitalizace firemni dokumentace",
+  "main": "app.js",
+  "scripts": {
+    "build:ts": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
