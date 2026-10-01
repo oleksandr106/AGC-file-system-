@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    AGC Technowizz 2027 ÔÇö Premium DMS Design System
    ============================================ */
 
@@ -177,6 +177,19 @@ body {
 /* =============================================
    LOGIN SCREEN
    ============================================= */
+.login-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.95);
+    visibility: hidden;
+}
+
+.hint-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden;
+}
+
 .login-container {
     display: flex;
     align-items: center;

@@ -87,8 +87,12 @@ async function fetchWithAuth(endpoint, options = {}) {
 function checkAuth() {
     if (token) {
         try {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            // Add padding to base64 string to prevent atob DOMException
+            while (base64.length % 4) {
+                base64 += '=';
+            }
             const payload = JSON.parse(window.atob(base64));
             // Check token expiration
             if (payload.exp && payload.exp * 1000 < Date.now()) {
@@ -102,6 +106,8 @@ function checkAuth() {
             showApp();
         }
         catch (e) {
+            console.error('checkAuth failed:', e);
+            alert('Chyba při přihlášení (checkAuth): ' + e.message);
             handleLogout();
         }
     }
@@ -225,7 +231,7 @@ function switchView(viewName) {
     const view = views[viewName];
     if (view) {
         title.innerText = view.title;
-        sub.innerText = view.sub;
+        if (sub) sub.innerText = view.sub;
         if (view.init)
             view.init();
     }
