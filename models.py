@@ -15,6 +15,8 @@ class Document(Base):
 
     # Vztah 1:N na verze dokumentu
     versions = relationship("DocumentVersion", back_populates="document", cascade="all, delete-orphan")
+    # Vztah 1:N na komentare
+    comments = relationship("Comment", back_populates="document", cascade="all, delete-orphan")
 
 class DocumentVersion(Base):
     __tablename__ = 'document_versions'
@@ -38,3 +40,14 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     role = Column(String(50), default="user")  # "admin" nebo "user"
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class Comment(Base):
+    __tablename__ = 'comments'
+
+    id = Column(Integer, primary_key=True, index=True)
+    document_id = Column(Integer, ForeignKey('documents.id'), nullable=False)
+    author = Column(String(255), nullable=False)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    document = relationship("Document", back_populates="comments")

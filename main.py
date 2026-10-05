@@ -28,7 +28,14 @@ try:
 except ImportError:
     load_workbook = None
 
-from models import Base, Document, DocumentVersion, User
+try:
+    from pptx import Presentation
+except ImportError:
+    Presentation = None
+
+from fpdf import FPDF
+
+from models import Base, Document, DocumentVersion, User, Comment
 from config import (
     SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
     SQLALCHEMY_DATABASE_URL, UPLOAD_DIR, BACKUP_DIR,
@@ -226,6 +233,19 @@ def extract_text_from_file(file_path: str, file_extension: str) -> str:
                 wb.close()
             except Exception as e:
                 logger.warning(f"Nelze extrahovat text z XLSX '{file_path}': {e}")
+
+    elif ext in (".pptx", ".ppt"):
+        if Presentation is None:
+            logger.warning("Knihovna python-pptx není nainstalována – přeskakuji extrakci PPTX.")
+        else:
+            try:
+                prs = Presentation(file_path)
+                for slide in prs.slides:
+                    for shape in slide.shapes:
+                        if hasattr(shape, "text"):
+                            extracted_text += shape.text + " "
+            except Exception as e:
+                logger.warning(f"Nelze extrahovat text z PPTX '{file_path}': {e}")
 
     return extracted_text.strip()
 
@@ -556,6 +576,90 @@ def get_recent_documents(db: Session = Depends(get_db), current_user: User = Dep
 
     return results
 
+
+# ============================================
+# COMMENTS ENDPOINTS
+# ============================================
+@app.get("/api/documents/{document_id}/comments")
+def get_comments(document_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail="Dokument nenalezen")
+    
+    if current_user.role != "admin" and document.status != "APPROVED":
+        raise HTTPException(status_code=403, detail="Nedostatečná oprávnění")
+
+    comments = db.query(Comment).filter(Comment.document_id == document_id).order_by(Comment.created_at.asc()).all()
+    return [{"id": c.id, "author": c.author, "text": c.text, "created_at": c.created_at} for c in comments]
+
+@app.post("/api/documents/{document_id}/comments")
+def add_comment(
+    document_id: int,
+    text: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail="Dokument nenalezen")
+    
+    new_comment = Comment(document_id=document.id, author=current_user.username, text=text)
+    db.add(new_comment)
+    db.commit()
+    logger.info(f"Uživatel '{current_user.username}' přidal komentář k dokumentu '{document.title}'.")
+    return {"message": "Komentář přidán"}
+
+# ============================================
+# DIGITALIZATION (PDF GENERATION) ENDPOINT
+# ============================================
+@app.post("/api/generate_pdf")
+def generate_pdf(
+    title: str = Form(...),
+    category: str = Form(...),
+    content: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Generování PDF z poskytnutého obsahu
+    pdf = FPDF()
+    pdf.add_page()
+    # Add a Unicode font (DejaVu) to support Czech characters
+    # But since we might not have a TTF file on the server easily, 
+    # we'll try to use a standard font or handle latin1 encoding for simplicity in prototype
+    pdf.set_font("Arial", size=12)
+    # Odstraníme diakritiku, aby nám nepadalo generování (zjednodušení pro FPDF bez unicode fontu)
+    import unicodedata
+    normalized_title = unicodedata.normalize('NFKD', title).encode('ASCII', 'ignore').decode('utf-8')
+    normalized_content = unicodedata.normalize('NFKD', content).encode('ASCII', 'ignore').decode('utf-8')
+    
+    pdf.cell(200, 10, text=f"Formular: {normalized_title}", ln=True, align='C')
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, text=normalized_content)
+    
+    safe_title = title.replace(" ", "_").replace("/", "_")
+    saved_filename = f"{safe_title}_generated_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf"
+    file_path = os.path.join(UPLOAD_DIR, saved_filename)
+    
+    pdf.output(file_path)
+    
+    # Uložit do databáze jako klasický dokument (verze 1.0)
+    document = Document(title=title, category=category, status="PENDING_APPROVAL")
+    db.add(document)
+    db.commit()
+    db.refresh(document)
+    
+    new_version = DocumentVersion(
+        document_id=document.id,
+        version_number=1.0,
+        file_path=file_path,
+        extracted_text=normalized_content,
+        uploaded_by=current_user.username,
+    )
+    db.add(new_version)
+    db.commit()
+    
+    logger.info(f"Uživatel '{current_user.username}' vygeneroval digitální formulář '{title}'.")
+    return {"message": f"Digitální formulář '{title}' byl vygenerován a čeká na schválení."}
 
 # ============================================
 # STATS ENDPOINT

@@ -98,6 +98,11 @@
                         <i class="ph-duotone ph-cloud-arrow-up"></i> Nový dokument
                     </a>
                 </li>
+                <li class="nav-item" id="menu-digital">
+                    <a onclick="switchView('digital')">
+                        <i class="ph-duotone ph-file-plus"></i> Digitalizace
+                    </a>
+                </li>
                 <li class="nav-item" id="menu-info">
                     <a onclick="switchView('info')">
                         <i class="ph-duotone ph-info"></i> Informace
@@ -314,6 +319,38 @@
                         <div style="margin-top: 1.5rem;">
                             <button type="submit" id="uploadBtn" class="btn-primary" style="padding: 0.85rem 2.5rem;">
                                 <i class="ph-bold ph-cloud-arrow-up"></i> Uložit do systému
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ========== DIGITALIZATION ========== -->
+            <section id="view-digital" class="view-section">
+                <div class="panel" style="max-width: 720px;">
+                    <h2 class="panel-title"><i class="ph-duotone ph-file-plus"></i> Generování formuláře (Digitalizace)</h2>
+                    <form id="digitalForm" onsubmit="handleDigitalization(event)">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="digiTitle">Název dokumentu (Formuláře)</label>
+                                <input type="text" id="digiTitle" class="form-input" required placeholder="Např. Zadanka_o_dovolenou">
+                            </div>
+                            <div class="form-group">
+                                <label for="digiCategory">Kategorie</label>
+                                <select id="digiCategory" class="select-input">
+                                    <option value="Řízená dokumentace">Řízená dokumentace</option>
+                                    <option value="Výrobní dokumentace">Výrobní dokumentace</option>
+                                    <option value="Školení a podklady">Školení a podklady</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="digiContent">Obsah formuláře</label>
+                                <textarea id="digiContent" class="form-input" style="height: 150px; resize: vertical;" required placeholder="Napište text formuláře, poznámky, nebo detaily údržby..."></textarea>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem;">
+                            <button type="submit" id="digiBtn" class="btn-primary" style="padding: 0.85rem 2.5rem;">
+                                <i class="ph-bold ph-magic-wand"></i> Vygenerovat PDF a uložit
                             </button>
                         </div>
                     </form>

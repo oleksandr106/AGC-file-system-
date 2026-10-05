@@ -195,6 +195,7 @@ function switchView(viewName) {
         dashboard: 'menu-dash',
         documents: 'menu-docs',
         upload: 'menu-upload',
+        digital: 'menu-digital',
         admin: 'menu-admin',
         info: 'menu-info',
     };
@@ -217,6 +218,10 @@ function switchView(viewName) {
         upload: {
             title: 'Nahrát dokument',
             sub: 'Vložte nový soubor nebo vytvořte novou verzi stávajícího dokumentu.',
+        },
+        digital: {
+            title: 'Digitalizace',
+            sub: 'Vytvořte digitální formulář a automaticky z něj generujte PDF ke schválení.',
         },
         admin: {
             title: 'Správa systému',
@@ -248,6 +253,42 @@ function openMobileSidebar() {
 function closeMobileSidebar() {
     document.querySelector('.sidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('active');
+}
+// ============================================
+// DIGITALIZATION
+// ============================================
+async function handleDigitalization(e) {
+    e.preventDefault();
+    const btn = document.getElementById('digiBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<span class="spinner"></span> Generování...';
+    
+    const formData = new FormData();
+    formData.append('title', document.getElementById('digiTitle').value);
+    formData.append('category', document.getElementById('digiCategory').value);
+    formData.append('content', document.getElementById('digiContent').value);
+    
+    try {
+        const res = await fetchWithAuth('/api/generate_pdf', {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            showToast('success', 'Úspěch', data.message);
+            document.getElementById('digitalForm').reset();
+            switchView('dashboard');
+        } else {
+            const data = await res.json();
+            showToast('error', 'Chyba', data.detail || 'Chyba při generování formuláře');
+        }
+    } catch (err) {
+        showToast('error', 'Chyba', 'Chyba připojení k serveru');
+    } finally {
+        btn.classList.remove('loading');
+        btn.innerHTML = '<i class="ph-bold ph-magic-wand"></i> Vygenerovat PDF a uložit';
+    }
 }
 // ============================================
 // DASHBOARD
@@ -640,12 +681,76 @@ async function showVersionHistory(docId, title) {
             </tr>`;
         });
         content += `</tbody></table></div>`;
-        showModal(`Historie verzí — ${title}`, content, [
+        
+        content += `
+            <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border);">
+            <h4>Komentáře</h4>
+            <div id="commentsList" style="max-height: 150px; overflow-y: auto; margin-bottom: 1rem; background: var(--bg-surface); padding: 0.5rem; border-radius: 4px;">Načítání...</div>
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="newCommentInput" class="form-input" placeholder="Napsat komentář..." style="flex: 1;">
+                <button class="btn-primary" onclick="addComment(${docId})"><i class="ph-bold ph-paper-plane-right"></i></button>
+            </div>
+        `;
+        
+        showModal(`Detail dokumentu — ${title}`, content, [
             { text: 'Zavřít', class: 'btn-secondary', action: 'closeModal()' },
         ]);
+        
+        loadComments(docId);
     }
     catch (err) {
         showToast('error', 'Chyba', 'Nepodařilo se načíst historii verzí.');
+    }
+}
+
+async function loadComments(docId) {
+    const list = document.getElementById('commentsList');
+    if(!list) return;
+    try {
+        const res = await fetchWithAuth(`/api/documents/${docId}/comments`);
+        if (res.ok) {
+            const comments = await res.json();
+            if (comments.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Žádné komentáře.</p>';
+            } else {
+                list.innerHTML = comments.map(c => `
+                    <div style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">
+                        <strong style="color: var(--accent-blue); font-size: 0.85rem;">${c.author}</strong>
+                        <span style="color: var(--text-muted); font-size: 0.75rem; margin-left: 0.5rem;">${new Date(c.created_at).toLocaleString()}</span>
+                        <div style="font-size: 0.9rem; margin-top: 0.2rem;">${c.text}</div>
+                    </div>
+                `).join('');
+            }
+            list.scrollTop = list.scrollHeight;
+        } else {
+            list.innerHTML = 'Nelze načíst komentáře.';
+        }
+    } catch (err) {
+        list.innerHTML = 'Chyba připojení.';
+    }
+}
+
+async function addComment(docId) {
+    const input = document.getElementById('newCommentInput');
+    const text = input.value.trim();
+    if(!text) return;
+    
+    const formData = new FormData();
+    formData.append('text', text);
+    
+    try {
+        const res = await fetchWithAuth(`/api/documents/${docId}/comments`, {
+            method: 'POST',
+            body: formData
+        });
+        if (res.ok) {
+            input.value = '';
+            loadComments(docId);
+        } else {
+            showToast('error', 'Chyba', 'Nepodařilo se přidat komentář');
+        }
+    } catch (err) {
+        showToast('error', 'Chyba', 'Chyba připojení');
     }
 }
 // ============================================
