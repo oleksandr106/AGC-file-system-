@@ -1808,3 +1808,623 @@ body {
 #loginScreen {
     transition: opacity 1s ease, visibility 1s ease;
 }
+
+/* =============================================
+   SUPER CLEAN FLAT UI (NO BLUR, NO AI GLOW)
+   ============================================= */
+:root, [data-theme="dark"] {
+    --bg-glass: rgba(15, 23, 42, 0.98) !important;
+    --bg-surface: rgba(15, 23, 42, 0.98) !important;
+    --border: rgba(255, 255, 255, 0.08) !important;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Remove blur filters from everything */
+.login-card, .panel, .sidebar, .header, .stat-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-soft) !important;
+}
+
+/* Remove weird glow effects / before/after pseudo elements that might add glows */
+.login-card::before, .login-card::after,
+.panel::before, .panel::after,
+.stat-card::before, .stat-card::after {
+    display: none !important;
+}
+
+/* Minimalist buttons */
+.btn-primary, .login-btn {
+    background: #2563eb !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    transition: background 0.2s ease !important;
+}
+.btn-primary:hover, .login-btn:hover {
+    background: #1d4ed8 !important;
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* Remove glowing outlines from inputs */
+.form-input, .search-input {
+    background: rgba(0,0,0,0.3) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+}
+.form-input:focus, .search-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    outline: none !important;
+}
+
+/* Sidebar clean up */
+.sidebar {
+    background: rgba(11, 15, 25, 1) !important; /* solid dark */
+    border-right: 1px solid var(--border) !important;
+}
+.nav-item.active {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-left: 3px solid #3b82f6 !important;
+    box-shadow: none !important;
+}
+
+/* =============================================
+   PREMIUM ENTERPRISE REDESIGN (OVERRIDING OLD STYLES)
+   ============================================= */
+
+/* 1. TYPOGRAPHY - Clean, single font family, no bold/chunky fonts */
+body, h1, h2, h3, h4, h5, h6, .brand-text, .login-logo {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+h1 {
+    font-size: 2rem !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.02em !important;
+    color: #ffffff !important;
+}
+
+/* 2. HEADER - Remove the bulky dark box */
+.header {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 0 2rem 0 !important;
+    backdrop-filter: none !important;
+}
+
+/* 3. STAT CARDS - Clean, data-focused, no colored background boxes for icons */
+.stat-card {
+    display: flex !important;
+    flex-direction: column-reverse !important; /* Number on top, label below */
+    padding: 1.5rem !important;
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+    position: relative;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-info h3 {
+    font-size: 0.8rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: #94a3b8 !important; /* Muted gray */
+    margin: 0 !important;
+    font-weight: 500 !important;
+}
+
+.stat-value {
+    font-size: 2.5rem !important;
+    font-weight: 300 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.25rem !important;
+    line-height: 1 !important;
+}
+
+/* Hide the cheap colored icon backgrounds */
+.stat-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #475569 !important; /* Very subtle icon color */
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+}
+.stat-icon i {
+    font-size: 1.5rem !important;
+}
+
+/* 4. PANELS - Elegant spacing and thin borders */
+.panel {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    padding: 1.75rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+}
+
+.panel-title {
+    font-size: 1.05rem !important;
+    font-weight: 500 !important;
+    color: #e2e8f0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+.panel-title i {
+    color: #94a3b8 !important; /* Muted icon */
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+/* 5. RECENT DOCUMENTS LIST - Clean it up */
+.recent-item {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    margin-bottom: 0.5rem !important;
+    transition: background 0.2s !important;
+}
+.recent-item:hover {
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+.recent-icon {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #e2e8f0 !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+}
+
+/* 6. CATEGORY BARS - Professional, no gradients */
+.category-row {
+    margin-bottom: 1rem !important;
+}
+.category-name {
+    font-size: 0.85rem !important;
+    color: #94a3b8 !important;
+    margin-bottom: 0.25rem !important;
+}
+.category-bar-bg {
+    background: rgba(255, 255, 255, 0.05) !important;
+    height: 6px !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+}
+.category-bar-fill {
+    background: #3b82f6 !important; /* Professional solid blue */
+    height: 100% !important;
+    border-radius: 3px !important;
+}
+.category-count {
+    font-size: 0.85rem !important;
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+}
+
+/* 7. SIDEBAR - More structured */
+.sidebar {
+    background: rgba(11, 15, 25, 0.95) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+.brand-text {
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+}
+.brand-logo {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+    font-family: 'Inter', sans-serif !important;
+    box-shadow: none !important;
+}
+.nav-item a {
+    color: #94a3b8 !important;
+    font-weight: 400 !important;
+}
+.nav-item.active {
+    background: transparent !important;
+    border-left: none !important;
+}
+.nav-item.active a {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+.nav-item.active a i {
+    color: #3b82f6 !important;
+}
+
+/* =============================================
+   MORE PREMIUM FIXES
+   ============================================= */
+
+/* Force completely remove Outfit font */
+:root, [data-theme="dark"] {
+    --font-display: 'Inter', system-ui, sans-serif !important;
+}
+
+.stat-value, .chart-bar-value, .brand-text {
+    font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+/* Category Chart Fixes (based on actual app.js classes) */
+.chart-bar-row {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.chart-bar-label {
+    font-size: 0.85rem !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+}
+
+.chart-bar-track {
+    background: rgba(255, 255, 255, 0.05) !important;
+    height: 6px !important;
+    border-radius: 3px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    position: relative !important;
+}
+
+.chart-bar-fill {
+    background: #3b82f6 !important; /* solid professional blue */
+    height: 100% !important;
+    border-radius: 3px !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding-right: 0px !important;
+}
+
+/* Move the number outside the bar so it's not trapped in the gradient pill */
+.chart-bar-value {
+    position: absolute !important;
+    right: -25px !important; 
+    top: -20px !important;
+    font-size: 0.85rem !important;
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+}
+
+/* Actually, the HTML wraps .chart-bar-value inside .chart-bar-fill. 
+   To place it properly, let's just make it float to the right side of the label instead, 
+   or put it on the right of the bar visually using position absolute */
+.chart-bar-row {
+    position: relative !important;
+}
+.chart-bar-value {
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    color: #e2e8f0 !important;
+}
+.chart-bar-fill .chart-bar-value {
+    /* Hide the original one inside the fill to replace its visual position, or just style it */
+    position: absolute !important;
+    right: 0 !important;
+    top: -22px !important;
+    color: #e2e8f0 !important;
+    font-size: 0.85rem !important;
+}
+.chart-bar-fill {
+    /* kill the gradient background completely */
+    background: #3b82f6 !important; 
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+
+/* =============================================
+   THEME FIXES (LIGHT MODE & DROPDOWNS)
+   ============================================= */
+
+/* LIGHT MODE OVERRIDES */
+:root:not([data-theme="dark"]), [data-theme="light"] {
+    --bg-surface: rgba(255, 255, 255, 0.95) !important;
+    --border: rgba(0, 0, 0, 0.1) !important;
+    --text-primary: #0f172a !important;
+    --text-muted: #64748b !important;
+}
+
+:root:not([data-theme="dark"]) .stat-card, 
+[data-theme="light"] .stat-card,
+:root:not([data-theme="dark"]) .panel, 
+[data-theme="light"] .panel,
+:root:not([data-theme="dark"]) .login-card, 
+[data-theme="light"] .login-card {
+    background: var(--bg-surface) !important;
+    border-color: var(--border) !important;
+}
+
+:root:not([data-theme="dark"]) .stat-value, 
+[data-theme="light"] .stat-value,
+:root:not([data-theme="dark"]) .panel-title, 
+[data-theme="light"] .panel-title,
+:root:not([data-theme="dark"]) h1, 
+[data-theme="light"] h1,
+:root:not([data-theme="dark"]) h2, 
+[data-theme="light"] h2,
+:root:not([data-theme="dark"]) h3, 
+[data-theme="light"] h3,
+:root:not([data-theme="dark"]) .chart-bar-value, 
+[data-theme="light"] .chart-bar-value {
+    color: var(--text-primary) !important;
+}
+
+:root:not([data-theme="dark"]) .stat-info h3, 
+[data-theme="light"] .stat-info h3,
+:root:not([data-theme="dark"]) .chart-bar-label, 
+[data-theme="light"] .chart-bar-label {
+    color: var(--text-muted) !important;
+}
+
+:root:not([data-theme="dark"]) .sidebar,
+[data-theme="light"] .sidebar {
+    background: #f8fafc !important;
+    border-right: 1px solid var(--border) !important;
+}
+
+:root:not([data-theme="dark"]) .nav-item a,
+[data-theme="light"] .nav-item a {
+    color: var(--text-muted) !important;
+}
+:root:not([data-theme="dark"]) .nav-item.active a,
+[data-theme="light"] .nav-item.active a {
+    color: var(--text-primary) !important;
+}
+:root:not([data-theme="dark"]) .chart-bar-track,
+[data-theme="light"] .chart-bar-track {
+    background: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* FIX DROPDOWN SELECT OPTIONS IN DARK MODE */
+[data-theme="dark"] select option {
+    background: #0f172a !important;
+    color: #f1f5f9 !important;
+}
+:root:not([data-theme="dark"]) select option,
+[data-theme="light"] select option {
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+/* FIX INPUT/SELECT BACKGROUNDS IN DARK MODE */
+[data-theme="dark"] .form-input, 
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .filter-select,
+[data-theme="dark"] .select-input {
+    background: rgba(0,0,0,0.3) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* FIX INPUT/SELECT BACKGROUNDS IN LIGHT MODE */
+:root:not([data-theme="dark"]) .form-input, 
+[data-theme="light"] .form-input,
+:root:not([data-theme="dark"]) .search-input, 
+[data-theme="light"] .search-input,
+:root:not([data-theme="dark"]) .filter-select,
+[data-theme="light"] .filter-select,
+:root:not([data-theme="dark"]) .select-input,
+[data-theme="light"] .select-input {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(0,0,0,0.15) !important;
+}
+
+/* RECENT DOCUMENTS ITEM LIGHT MODE FIX */
+:root:not([data-theme="dark"]) .recent-item,
+[data-theme="light"] .recent-item {
+    border-color: rgba(0,0,0,0.08) !important;
+    color: var(--text-primary) !important;
+}
+:root:not([data-theme="dark"]) .recent-item:hover,
+[data-theme="light"] .recent-item:hover {
+    background: rgba(0,0,0,0.03) !important;
+}
+:root:not([data-theme="dark"]) .recent-icon,
+[data-theme="light"] .recent-icon {
+    background: rgba(0,0,0,0.05) !important;
+    color: var(--text-primary) !important;
+}
+:root:not([data-theme="dark"]) .empty-state,
+[data-theme="light"] .empty-state {
+    color: var(--text-muted) !important;
+}
+
+/* BRAND TEXT LIGHT MODE FIX */
+:root:not([data-theme="dark"]) .brand-text,
+[data-theme="light"] .brand-text {
+    color: var(--text-primary) !important;
+}
+:root:not([data-theme="dark"]) .brand-logo,
+[data-theme="light"] .brand-logo {
+    background: var(--text-primary) !important;
+    color: #ffffff !important;
+}
+
+/* TABLE TEXT IN LIGHT MODE FIX */
+:root:not([data-theme="dark"]) .dms-table th,
+[data-theme="light"] .dms-table th {
+    color: var(--text-muted) !important;
+    border-bottom-color: var(--border) !important;
+}
+:root:not([data-theme="dark"]) .dms-table td,
+[data-theme="light"] .dms-table td {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border) !important;
+}
+:root:not([data-theme="dark"]) .dms-table tbody tr:hover,
+[data-theme="light"] .dms-table tbody tr:hover {
+    background: rgba(0,0,0,0.02) !important;
+}
+
+/* =============================================
+   LIGHT MODE BUTTONS & BADGES FIXES
+   ============================================= */
+
+/* Fix Logout and Secondary Buttons in Light Mode */
+:root:not([data-theme="dark"]) .btn-secondary,
+[data-theme="light"] .btn-secondary,
+:root:not([data-theme="dark"]) .nav-btn,
+[data-theme="light"] .nav-btn,
+:root:not([data-theme="dark"]) .logout-btn,
+[data-theme="light"] .logout-btn {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+:root:not([data-theme="dark"]) .btn-secondary:hover,
+[data-theme="light"] .btn-secondary:hover,
+:root:not([data-theme="dark"]) .nav-btn:hover,
+[data-theme="light"] .nav-btn:hover,
+:root:not([data-theme="dark"]) .logout-btn:hover,
+[data-theme="light"] .logout-btn:hover {
+    background: #cbd5e1 !important;
+}
+
+/* Primary buttons should always have white text */
+.btn-primary, .login-btn {
+    color: #ffffff !important;
+}
+
+/* Feature cards in "O projektu" in Light Mode */
+:root:not([data-theme="dark"]) .feature-card,
+[data-theme="light"] .feature-card,
+:root:not([data-theme="dark"]) .about-card,
+[data-theme="light"] .about-card,
+:root:not([data-theme="dark"]) .panel-grid > div,
+[data-theme="light"] .panel-grid > div {
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    color: #0f172a !important;
+}
+
+:root:not([data-theme="dark"]) .feature-card h3,
+[data-theme="light"] .feature-card h3,
+:root:not([data-theme="dark"]) .about-card h3,
+[data-theme="light"] .about-card h3,
+:root:not([data-theme="dark"]) .feature-card h4,
+[data-theme="light"] .feature-card h4 {
+    color: #0f172a !important;
+}
+
+:root:not([data-theme="dark"]) .feature-card p,
+[data-theme="light"] .feature-card p,
+:root:not([data-theme="dark"]) .about-card p,
+[data-theme="light"] .about-card p,
+:root:not([data-theme="dark"]) .feature-card span,
+[data-theme="light"] .feature-card span {
+    color: #475569 !important;
+}
+
+:root:not([data-theme="dark"]) .feature-icon,
+[data-theme="light"] .feature-icon {
+    color: #3b82f6 !important;
+}
+
+/* Badges (like Category or Status) */
+:root:not([data-theme="dark"]) .badge,
+[data-theme="light"] .badge,
+:root:not([data-theme="dark"]) .status-badge,
+[data-theme="light"] .status-badge,
+:root:not([data-theme="dark"]) .category-badge,
+[data-theme="light"] .category-badge,
+:root:not([data-theme="dark"]) span[class*="badge"],
+[data-theme="light"] span[class*="badge"] {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Code tags / inline code (like backups/) */
+:root:not([data-theme="dark"]) code,
+[data-theme="light"] code {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Fix user info block in sidebar */
+:root:not([data-theme="dark"]) .user-info,
+[data-theme="light"] .user-info {
+    color: #0f172a !important;
+}
+:root:not([data-theme="dark"]) .user-details span,
+[data-theme="light"] .user-details span {
+    color: #64748b !important;
+}
+:root:not([data-theme="dark"]) .user-details strong,
+[data-theme="light"] .user-details strong {
+    color: #0f172a !important;
+}
+
+/* =============================================
+   MORE LIGHT MODE FIXES
+   ============================================= */
+
+/* Fix Logout button properly */
+:root:not([data-theme="dark"]) .sidebar-action-btn,
+[data-theme="light"] .sidebar-action-btn {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+:root:not([data-theme="dark"]) .sidebar-action-btn:hover,
+[data-theme="light"] .sidebar-action-btn:hover {
+    background: #cbd5e1 !important;
+}
+
+/* Fix generic secondary buttons inside light mode */
+:root:not([data-theme="dark"]) button.btn-secondary,
+[data-theme="light"] button.btn-secondary,
+:root:not([data-theme="dark"]) .panel button,
+[data-theme="light"] .panel button:not(.btn-primary) {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+}
+:root:not([data-theme="dark"]) .panel button.btn-primary,
+[data-theme="light"] .panel button.btn-primary {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+/* Make logo uniform and nice in both modes (so it's not inverted weirdly) */
+.brand-logo {
+    background: #3b82f6 !important; /* solid blue looks great in both modes */
+    color: #ffffff !important;
+}
